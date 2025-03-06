@@ -51,7 +51,7 @@
   "gypfile": true,
   "scripts": {
     "test": "npx @kmamal/testing",
-    "install": "cd scripts && node install.mjs",
+    "install": "node-pre-gyp install --fallback-to-build || (cd scripts && node install.mjs)",
     "download-release": "cd scripts && node download-release.mjs",
     "download-sdl": "cd scripts && node download-sdl.mjs",
     "build": "cd scripts && node build.mjs",
@@ -60,9 +60,17 @@
     "clean": "cd scripts && node clean.mjs"
   },
   "dependencies": {
+    "@mapbox/node-pre-gyp": "^2.0.0",
     "node-addon-api": "^8.3.1",
     "node-gyp": "^11.1.0",
     "tar": "^7.4.3"
+  },
+  "binary": {
+    "module_name": "sdl",
+    "module_path": "./prebuilds",
+    "host": "https://github.com/HyperSpin-LLC/node-sdl/releases/download/",
+    "remote_path": "v{version}",
+    "package_name": "{platform}-{arch}-{node_abi}.node"
   },
   "sdl": {
     "owner": "kmamal",
