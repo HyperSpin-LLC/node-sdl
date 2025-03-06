@@ -25,6 +25,35 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
+
+      - name: Install SDL2 (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev
+          echo "SDL_INC=/usr/include/SDL2" >> $GITHUB_ENV
+          echo "SDL_LIB=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
+
+      - name: Install SDL2 (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install sdl2
+          echo "SDL_INC=/usr/local/include/SDL2" >> $GITHUB_ENV
+          echo "SDL_LIB=/usr/local/lib" >> $GITHUB_ENV
+
+      - name: Install SDL2 (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $sdl_version="2.28.5"
+          $sdl_url="https://github.com/libsdl-org/SDL/releases/download/release-${sdl_version}/SDL2-devel-${sdl_version}-VC.zip"
+          Invoke-WebRequest -Uri $sdl_url -OutFile SDL2.zip
+          Expand-Archive SDL2.zip -DestinationPath .
+          mkdir C:\SDL2
+          Copy-Item -Path "SDL2-${sdl_version}\include" -Destination "C:\SDL2\include" -Recurse -Force
+          Copy-Item -Path "SDL2-${sdl_version}\lib\x64" -Destination "C:\SDL2\lib" -Recurse -Force
+          echo "SDL_INC=C:\SDL2\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "SDL_LIB=C:\SDL2\lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Copy-Item "SDL2-${sdl_version}\lib\x64\SDL2.dll" -Destination "C:\SDL2\lib\" -Force
         
       - name: Build
         run: npm run build
